@@ -1,0 +1,29 @@
+#!/usr/bin/python3
+import sys
+import os
+from os import write
+
+
+def run():
+    f = open("temp.txt", "a")
+    while True:
+        reading = input().rstrip()
+        f.write('Manager:\n' + reading + '\n')
+        if reading == "END":
+            break
+        if reading == "ABOUT":
+            print('name="OpenAI", version="1.0", author="Mazero", country="France"\r')
+            f.write('Bot:\n' + 'name="OpenAI", version="1.0", author="Mazero", country="France"\n')
+            f.write('\n' + '----------' + '\n\n')
+        elif reading == "START 20":
+            print("OK\r")
+            f.write("Bot:\nStarting...\n")
+            f.write('\n' + '----------' + '\n\n')
+        else:
+            f.write('\n' + '----------' + '\n\n')
+
+def main():
+    run()
+
+if __name__ == "__main__":
+    exit(main())

@@ -137,6 +137,7 @@ env.bak/
 venv.bak/
 
 # Configurations
+/bot.ini
 /config.ini
 
 # Spyder project settings

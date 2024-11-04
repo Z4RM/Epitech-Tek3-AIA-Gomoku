@@ -23,15 +23,19 @@ class Commands:
     def execute(self, command):
         command = command.split()
         if len(command) < 1:
+            self.logger.error("Received empty command")
             return
         if command[0] not in self.commands or self.commands[command[0]] is None:
+            self.logger.error(f"Unknown command: {command[0]}")
             print(f"UNKNOWN Unknown command: {command[0]}\r")
             return
         if self.commands[command[0]].requirements is not None:
             for requirement in self.commands[command[0]].requirements:
                 if not self.commands[requirement].executions:
+                    self.logger.error(f"Requirement not met for {command[0]}: {requirement}")
                     print(f"ERROR {requirement} must be executed before {command[0]}\r")
                     return
+        self.logger.debug(f"Executing command: {command[0]}")
         return self.commands[command[0]](command)
 
     def about(self, _):
@@ -40,6 +44,7 @@ class Commands:
     def start(self, command):
         # TODO: error if <= 1
         if len(command) <= 1:
+            self.logger.error("Missing size in START command")
             return False
         size = int(command[1])
         self.bot.map = [[Cell.Empty for _ in range(size)] for _ in range(size)]
@@ -55,12 +60,14 @@ class Commands:
     def turn(self, command):
         # TODO: error if <= 1
         if len(command) <= 1:
+            self.logger.error("Missing coordinates in TURN command")
             return False
         if self.bot.player == Player.Undefined:
             self.bot.player = Player.Player2
         coordinate = command[1].split(",")
-        # TODO: error if < 2
-        if len(coordinate) < 2:
+        # TODO: error if != 2
+        if len(coordinate) != 2:
+            self.logger.error(f"Invalid coordinates in TURN command: {command[1]}")
             return False
         x = int(coordinate[0])
         y = int(coordinate[1])

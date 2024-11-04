@@ -14,8 +14,10 @@ class Bot:
         self.player = Player.Undefined
         from src.Commands.Commands import Commands  # Deferred import to avoid circular dependencies issues between Bot and Commands
         self.commands = Commands(self, logger)
+        self.logger.info(self.information())
 
     def play(self):
+        self.logger.debug(f"{self.information.name} is playing")
         x = randrange(len(self.map))
         y = randrange(len(self.map))
         while self.map[y][x] != Cell.Empty:
@@ -25,10 +27,14 @@ class Bot:
         print(f"{x},{y}\r")
 
     def run(self):
+        self.logger.info(f"{self.information.name} is running")
         while True:
             try:
-                command = input()
+                command = input().strip()
             except EOFError:
+                self.logger.debug("Received EOF (Ctrl + D), exiting")
                 break
-            if self.commands.execute(command.strip()):
+            self.logger.debug(f"Received command: {command}")
+            if self.commands.execute(command):
                 break
+        self.logger.info(f"{self.information.name} is stopping")

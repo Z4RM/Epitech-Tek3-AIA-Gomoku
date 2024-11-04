@@ -1,75 +1,7 @@
-#!/usr/bin/python3
-import random
-import time
+#!/usr/bin/env bash
 
+python_path=$(pwd)/src
 
-class Bot:
-    def __init__(self):
-        self.name = "OpenAI"
-        self.version = "Alpha"
-        self.author = "JCM"
-        self.country = "France"
-        self.map = []
-        self.size = 0
-        self.player = 0
-        self.commands = [
-            {"name": "ABOUT", "function": self.about},
-            {"name": "START", "function": self.start},
-            {"name": "TURN", "function": self.turn},
-            {"name": "BEGIN", "function": self.begin},
-            {"name": "INFO", "function": None},
-        ]
+export PYTHONPATH=$python_path
 
-    def about(self, command):
-        print(f'name="{self.name}", version="{self.version}", author="{self.author}", country="{self.country}"\r')
-
-    def start(self, command):
-        if len(command) > 1:
-            self.size = int(command[1])
-            self.map = [[0 for x in range(self.size)] for y in range(self.size)]
-        print("OK\r")
-
-    def play(self, command):
-        rand_x = random.randrange(self.size)
-        rand_y = random.randrange(self.size)
-        while self.map[rand_x][rand_y] != 0:
-            rand_x = random.randrange(self.size)
-            rand_y = random.randrange(self.size)
-        self.map[rand_x][rand_y] = 1
-        print(str(rand_x) + "," + str(rand_y) + "\r")
-
-    def turn(self, command):
-        if self.player == 0:
-            self.player = 2
-        coordinate = command[1].split(",")
-        x = int(coordinate[0])
-        y = int(coordinate[1])
-        self.map[x][y] = 2
-        self.play(command)
-
-    def begin(self, command):
-        self.player = 1
-        self.play(command)
-
-    def find_command(self, command):
-        for c in self.commands:
-            if c["name"] == command[0]:
-                if c["function"] is not None:
-                    c["function"](command)
-                return
-        print("UNKNOWN COMMAND\r")
-
-    def run(self):
-        while True:
-            command = input().strip().split(" ")
-            if command[0] == "END":
-                break
-            self.find_command(command)
-
-def main():
-    bot = Bot()
-    bot.run()
-    return 0
-
-if __name__ == "__main__":
-    exit(main())
+python3 -m main "$0" "$@"

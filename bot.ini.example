@@ -1,0 +1,23 @@
+; See the README.md for more information on this file and how to use it.
+
+[bot]
+; The name of the bot
+name=Bot
+; The version of the bot
+version=0.0.1
+; The author of the bot
+author=OpenAI
+; The country of the bot
+country=France
+
+[log]
+; Minimum log level
+; Debug | All logs are shown (Lots of data)
+; Info  | All logs at info or above are shown
+; Warn  | All logs at warn or above are shown
+; Error | All logs at error or above are shown (almost nothing)
+; Fatal | All logs at fatal are shown (Only happens once at most)
+; None  | No logs are shown ever (default)
+level=None
+; The log file to write to
+file=log.txt

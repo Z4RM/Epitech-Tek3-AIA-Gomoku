@@ -14,12 +14,16 @@ class Commands:
         self.commands = {
             "ABOUT": Command(self.about),
             "START": Command(self.start),
+            "RECTSTART": Command(self.rectstart),
+            "RESTART": Command(self.restart, [START_REQUIREMENT]),
+            "SWAP2BOARD": Command(self.swap2board, [START_REQUIREMENT]),
+            "BOARD": Command(self.board, [START_REQUIREMENT]),
             "BEGIN": Command(self.begin, [START_REQUIREMENT]),
             "INFO": Command(self.info),
-            "BOARD": None,  # TODO
             "TURN": Command(self.turn, [START_REQUIREMENT]),
+            "PLAY": Command(self.play, [START_REQUIREMENT]),
+            "TAKEBACK": Command(self.takeback, [START_REQUIREMENT]),
             "END": Command(self.end)
-            # TODO: other commands
         }
 
     def execute(self, command):
@@ -64,6 +68,18 @@ class Commands:
         self.bot.map = [[Cell.Empty for _ in range(size)] for _ in range(size)]
         print("OK\r")
 
+    def rectstart(self, _):
+        return self.unknown("RECTSTART command isn't yet implemented")
+
+    def restart(self, _):
+        return self.unknown("RESTART command isn't yet implemented")
+
+    def swap2board(self, _):
+        return self.unknown("SWAP2BOARD command isn't yet implemented")
+
+    def board(self, _):
+        return self.unknown("BOARD command isn't yet implemented")
+
     def begin(self, _):
         self.bot.player = Player.Player1
         self.bot.play()
@@ -83,6 +99,12 @@ class Commands:
         y = int(coordinate[1])
         self.bot.map[y][x] = self.bot.player.opponent()
         self.bot.play()
+
+    def play(self, _):
+        return self.unknown("PLAY command isn't yet implemented")
+
+    def takeback(self, _):
+        return self.unknown("TAKEBACK command isn't yet implemented")
 
     @staticmethod
     def end(_):

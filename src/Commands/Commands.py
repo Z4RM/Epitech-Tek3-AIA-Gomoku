@@ -42,11 +42,11 @@ class Commands:
         print(self.bot.information())
 
     def start(self, command):
-        # TODO: error if <= 1
         if len(command) <= 1:
-            self.logger.error("Missing size in START command")
-            return False
+            return self.error("Missing size in START command")
         size = int(command[1])
+        if size < 5:
+            return self.error(f"Invalid size in START command: {size} (too small)")
         self.bot.map = [[Cell.Empty for _ in range(size)] for _ in range(size)]
         print("OK\r")
 
@@ -58,17 +58,13 @@ class Commands:
         pass
 
     def turn(self, command):
-        # TODO: error if <= 1
         if len(command) <= 1:
-            self.logger.error("Missing coordinates in TURN command")
-            return False
+            return self.error("Missing coordinates in TURN command")
         if self.bot.player == Player.Undefined:
             self.bot.player = Player.Player2
         coordinate = command[1].split(",")
-        # TODO: error if != 2
         if len(coordinate) != 2:
-            self.logger.error(f"Invalid coordinates in TURN command: {command[1]}")
-            return False
+            return self.error(f"Invalid coordinates in TURN command: {command[1]}")
         x = int(coordinate[0])
         y = int(coordinate[1])
         self.bot.map[y][x] = self.bot.player.opponent()
@@ -77,3 +73,8 @@ class Commands:
     @staticmethod
     def end(_):
         return True
+
+    def error(self, message):
+        self.logger.error(message)
+        print(f"ERROR {message}\r")
+        return False

@@ -4,6 +4,8 @@ from src.Enums.Player import Player
 from src.Enums.Cell import Cell
 from src.Commands.Command import Command
 
+START_REQUIREMENT = ["START", "RECTSTART"]
+
 
 class Commands:
     def __init__(self, bot: Bot, logger: Logger):
@@ -12,10 +14,10 @@ class Commands:
         self.commands = {
             "ABOUT": Command(self.about),
             "START": Command(self.start),
-            "BEGIN": Command(self.begin, ["START"]),
+            "BEGIN": Command(self.begin, [START_REQUIREMENT]),
             "INFO": Command(self.info),
             "BOARD": None,  # TODO
-            "TURN": Command(self.turn, ["START"]),
+            "TURN": Command(self.turn, [START_REQUIREMENT]),
             "END": Command(self.end)
             # TODO: other commands
         }
@@ -25,18 +27,30 @@ class Commands:
         if len(command) < 1:
             self.logger.error("Received empty command")
             return
-        if command[0] not in self.commands or self.commands[command[0]] is None:
-            self.logger.error(f"Unknown command: {command[0]}")
-            print(f"UNKNOWN Unknown command: {command[0]}\r")
+        if command[0] not in self.commands:
+            self.unknown(f"Unknown command: {command[0]}")
             return
-        if self.commands[command[0]].requirements is not None:
-            for requirement in self.commands[command[0]].requirements:
-                if not self.commands[requirement].executions:
-                    self.logger.error(f"Requirement not met for {command[0]}: {requirement}")
-                    print(f"ERROR {requirement} must be executed before {command[0]}\r")
-                    return
+        if not self.has_requirements(command[0]):
+            return
         self.logger.debug(f"Executing command: {command[0]}")
         return self.commands[command[0]](command)
+
+    def has_requirements(self, command):
+        if self.commands[command].requirements is None:
+            return True
+        for requirement in self.commands[command].requirements:
+            if isinstance(requirement, list):
+                executed = 0
+                for r in requirement:
+                    if self.commands[r].executions:
+                        executed += 1
+                if executed == 0:
+                    print(f"One of these commands must be executed before {command}: {', '.join(requirement)}\r")
+                    return False
+            elif not self.commands[requirement].executions:
+                print(f"{requirement} command must be executed before {command}\r")
+                return False
+        return True
 
     def about(self, _):
         print(self.bot.information())
@@ -73,6 +87,11 @@ class Commands:
     @staticmethod
     def end(_):
         return True
+
+    def unknown(self, message):
+        self.logger.error(message)
+        print(f"UNKNOWN {message}\r")
+        return False
 
     def error(self, message):
         self.logger.error(message)

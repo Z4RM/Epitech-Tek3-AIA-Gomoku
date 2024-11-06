@@ -2,7 +2,7 @@ from typing import Callable, List
 
 
 class Command:
-    def __init__(self, command: Callable[[List[str]], bool | None], requirements: List[str] = None):
+    def __init__(self, command: Callable[[List[str]], bool | None], requirements: List[str | List[str]] = None):
         self.command = command
         self.requirements = requirements
         self.executions = 0

@@ -12,7 +12,6 @@ LOG_LEVEL = {
 }
 
 
-# TODO: differentiate file between two bots
 class Logger:
     def __init__(self, config: Config):
         try:

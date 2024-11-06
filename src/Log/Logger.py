@@ -14,18 +14,25 @@ LOG_LEVEL = {
 
 # TODO: differentiate file between two bots
 class Logger:
-    def __init__(self, config: Config, log_file="log.txt"):
-        self.log_file = open(log_file, "a")
+    def __init__(self, config: Config):
         try:
             self.log_level = config.get("log", "level")
         except KeyError:
-            self.log_level = "Info"
+            self.log_level = "None"
         if self.log_level not in LOG_LEVEL:
-            self.log_level = "Info"
+            self.log_level = "None"
+        if self.log_level == "None":
+            return
+        try:
+            log_file = config.get("log", "file")
+        except KeyError:
+            log_file = "log.txt"
+        self.log_file = open(log_file, "a")
         self.log_file.write("====================\n")
 
     def __del__(self):
-        self.log_file.close()
+        if self.log_level is not "None":
+            self.log_file.close()
 
     def log(self, log_level, message):
         if LOG_LEVEL[self.log_level] <= LOG_LEVEL[log_level]:

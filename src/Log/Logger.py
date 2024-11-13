@@ -30,7 +30,7 @@ class Logger:
         self.log_file.write("====================\n")
 
     def __del__(self):
-        if self.log_level is not "None":
+        if self.log_level != "None":
             self.log_file.close()
 
     def log(self, log_level, message):

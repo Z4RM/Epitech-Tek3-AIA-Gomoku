@@ -1,8 +1,9 @@
 from typing import Callable, List
+from src.Commands.CommandSuite import CommandSuite
 
 
 class Command:
-    def __init__(self, command: Callable[[List[str]], bool | None], requirements: List[str | List[str]] = None):
+    def __init__(self, command: Callable[[List[str]], bool | None] | CommandSuite, requirements: List[str | List[str]] = None):
         self.command = command
         self.requirements = requirements
         self.executions = 0

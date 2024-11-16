@@ -1,3 +1,5 @@
+# ⚠️ This repository is dedicated to (the research of) [@Clement-Z4RM](https://github.com/Clement-Z4RM), last seen on GitHub on Thursday, November 14, 2024 morning. If you have any information, please contact us. Your help is greatly appreciated.
+
 # Gomoku
 
 ### Configuration

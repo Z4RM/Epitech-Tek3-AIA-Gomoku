@@ -66,6 +66,14 @@ class Bot:
 
         return score
 
+    def get_possible_moves(self):
+        moves = []
+        for y in range(len(self.map)):
+            for x in range(len(self.map[y])):
+                if self.map[y][x] == Cell.Empty:
+                    moves.append((x, y))
+        return moves
+
     def reset_map(self, width=None, height=None):
         if width is None:
             if self.map is not None:

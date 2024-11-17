@@ -44,6 +44,28 @@ class Bot:
 
         return score
 
+    def evaluate(self):
+        score = 0
+
+        for row in range(len(self.map)):
+            for col in range(len(self.map[0]) - 4):
+                window = self.map[row][col:col + 5]
+                score += self.evaluate_window(window)
+        for col in range(len(self.map[0])):
+            for row in range(len(self.map) - 4):
+                window = [self.map[row + i][col] for i in range(5)]
+                score += self.evaluate_window(window)
+        for row in range(len(self.map) - 4):
+            for col in range(len(self.map[0]) - 4):
+                window = [self.map[row + i][col + i] for i in range(5)]
+                score += self.evaluate_window(window)
+        for row in range(4, len(self.map)):
+            for col in range(len(self.map[0]) - 4):
+                window = [self.map[row - i][col + i] for i in range(5)]
+                score += self.evaluate_window(window)
+
+        return score
+
     def reset_map(self, width=None, height=None):
         if width is None:
             if self.map is not None:

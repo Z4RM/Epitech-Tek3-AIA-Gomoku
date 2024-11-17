@@ -74,6 +74,30 @@ class Bot:
                     moves.append((x, y))
         return moves
 
+    def check_winner(self):
+        for row in range(len(self.map)):
+            for col in range(len(self.map[0]) - 4):
+                if self.map[row][col] != Cell.Empty and self.map[row][col] == self.map[row][col + 1] == self.map[row][
+                    col + 2] == self.map[row][col + 3] == self.map[row][col + 4]:
+                    return self.map[row][col]
+        for col in range(len(self.map[0])):
+            for row in range(len(self.map) - 4):
+                if self.map[row][col] != Cell.Empty and self.map[row][col] == self.map[row + 1][col] == \
+                        self.map[row + 2][col] == self.map[row + 3][col] == self.map[row + 4][col]:
+                    return self.map[row][col]
+        for row in range(len(self.map) - 4):
+            for col in range(len(self.map[0]) - 4):
+                if self.map[row][col] != Cell.Empty and self.map[row][col] == self.map[row + 1][col + 1] == \
+                        self.map[row + 2][col + 2] == self.map[row + 3][col + 3] == self.map[row + 4][col + 4]:
+                    return self.map[row][col]
+        for row in range(4, len(self.map)):
+            for col in range(len(self.map[0]) - 4):
+                if self.map[row][col] != Cell.Empty and self.map[row][col] == self.map[row - 1][col + 1] == \
+                        self.map[row - 2][col + 2] == self.map[row - 3][col + 3] == self.map[row - 4][col + 4]:
+                    return self.map[row][col]
+
+        return None
+
     def reset_map(self, width=None, height=None):
         if width is None:
             if self.map is not None:

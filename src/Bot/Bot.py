@@ -16,6 +16,34 @@ class Bot:
         self.commands = Commands(self, logger)
         self.logger.info(self.information())
 
+    def minimax(self, depth, alpha, beta, maximizing_player):
+        #Put here the function of Mathis
+            return 0
+
+    def evaluate_window(self, window):
+        score = 0
+        player1_count = window.count(Cell.Player1)
+        player2_count = window.count(Cell.Player2)
+
+        if player1_count == 5:
+            score += 100000
+        elif player2_count == 5:
+            score -= 100000
+        if player1_count == 4 and window.count(Cell.Empty) == 1:
+            score += 1000
+        elif player2_count == 4 and window.count(Cell.Empty) == 1:
+            score -= 1000
+        if player1_count == 3 and window.count(Cell.Empty) == 2:
+            score += 100
+        elif player2_count == 3 and window.count(Cell.Empty) == 2:
+            score -= 100
+        if player1_count == 2 and window.count(Cell.Empty) == 3:
+            score += 10
+        elif player2_count == 2 and window.count(Cell.Empty) == 3:
+            score -= 10
+
+        return score
+
     def reset_map(self, width=None, height=None):
         if width is None:
             if self.map is not None:

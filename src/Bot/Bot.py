@@ -3,22 +3,69 @@ from src.Config.Config import Config
 from src.Log.Logger import Logger
 from src.Enums.Player import Player
 from src.Enums.Cell import Cell
+from src.Enums.Direction import Direction
 from src.Bot.Information import Information
-
 
 class Bot:
     def __init__(self, config: Config, logger: Logger):
         self.information = Information(config)
         self.logger = logger
         self.map = None
+        self.size = 0
         self.player = Player.Undefined
         from src.Commands.Commands import Commands  # Deferred import to avoid circular dependencies issues between Bot and Commands
         self.commands = Commands(self, logger)
         self.logger.info(self.information())
 
+    def check_line(self, y, x, direction):
+        dy, dx = direction
+        weight = 0
+        for i in range(1, 6):
+            tmp_y = y + dy * i
+            tmp_x = x + dx * i
+            if tmp_y < 0 or tmp_x < 0 or tmp_y >= 20 or tmp_x >= 20 or (tmp_y == y and tmp_x == x):
+                continue
+            cell = self.map[tmp_y][tmp_x]
+            if cell == self.player:
+                weight += 5
+            elif cell == Cell.Empty:
+                weight += 0
+            else:
+                weight += -2
+        return weight
+
+    def check_case(self, y, x, player):
+        up_left_line = self.check_line(y, x, Direction.UL.value)
+        up_right_line = self.check_line(y, x, Direction.UR.value)
+        up_line = self.check_line(y, x, Direction.UP.value)
+        left_line = self.check_line(y, x, Direction.LEFT.value)
+        right_line = self.check_line(y, x, Direction.RIGHT.value)
+        down_left_line = self.check_line(y, x, Direction.DL.value)
+        down_right_line = self.check_line(y, x, Direction.DR.value)
+        down_line = self.check_line(y, x, Direction.DOWN.value)
+        weight = up_left_line + up_right_line + up_line + left_line + right_line + down_left_line + down_right_line + down_line
+        return weight
+
+    def calc_weight(self):
+        weight_map = [[0 for _ in range(self.size)] for _ in range(self.size)]
+        for cell_y in range(self.size):
+            for cell_x in range(self.size):
+                cell = self.map[cell_y][cell_x]
+                if cell is Cell.Empty:
+                    weight_map[cell_y][cell_x] = self.check_case(cell_y, cell_x, 1)
+                cell = -1
+        best_y = 0
+        best_x = 0
+        best_weight = 0
+        for cy in range(self.size):
+            for cx in range(self.size):
+                if weight_map[cy][cy] > best_weight:
+                    best_y = cy
+                    best_x = cx
+        return best_y, best_x
+
     def minimax(self, depth, alpha, beta, maximizing_player):
-        #Put here the function of Mathis
-            return 0
+        return self.calc_weight()
 
     def evaluate_window(self, window):
         score = 0
@@ -112,13 +159,14 @@ class Bot:
         self.map = [[Cell.Empty for _ in range(width)] for _ in range(height)]
 
     def play(self):
+        play_y, play_x = self.minimax(1, 0, 0, 2)
         self.logger.debug(f"{self.information.name} is playing")
         x = randrange(len(self.map[0]))
         y = randrange(len(self.map))
         while self.map[y][x] != Cell.Empty:
             x = randrange(len(self.map[0]))
             y = randrange(len(self.map))
-        self.map[y][x] = self.player
+        self.map[play_y][play_x] = self.player
         print(f"{x},{y}\r")
 
     def run(self):

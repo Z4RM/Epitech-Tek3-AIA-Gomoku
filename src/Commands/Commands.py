@@ -76,6 +76,7 @@ class Commands:
         if size < 5:
             return self.error(f"Invalid size in START command: {size} (too small)")
         self.bot.reset_map(size)
+        self.bot.size = size
         print("OK\r")
 
     def rectstart(self, _):

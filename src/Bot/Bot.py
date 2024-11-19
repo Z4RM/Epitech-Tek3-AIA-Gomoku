@@ -92,7 +92,45 @@ class Bot:
         return best_y, best_x, total_weight
 
     def minimax(self, depth, alpha, beta, maximizing_player):
-        return self.calc_weight()
+        if depth == 0 or self.check_winner() is not None:
+            total_weight = self.calc_weight()
+            return total_weight
+
+        # Maximizing player
+        if maximizing_player:
+            max_eval = float('-inf')
+            total_weight = self.calc_weight()
+            max_eval = max(max_eval, total_weight)
+            alpha = max(alpha, max_eval)
+
+            for move in self.get_possible_moves():
+                x, y = move
+                self.map[y][x] = self.player
+                eval = self.minimax(depth - 1, alpha, beta, False)
+                self.map[y][x] = Cell.Empty
+                max_eval = max(max_eval, eval)
+                alpha = max(alpha, eval)
+                if beta <= alpha:
+                    break
+            return max_eval
+
+        # Minimizing player
+        else:
+            min_eval = float('inf')
+            total_weight = self.calc_weight()
+            min_eval = min(min_eval, total_weight)
+            beta = min(beta, min_eval)
+
+            for move in self.get_possible_moves():
+                x, y = move
+                self.map[y][x] = Cell.Player2 if self.player == Cell.Player1 else Cell.Player1
+                eval = self.minimax(depth - 1, alpha, beta, True)
+                self.map[y][x] = Cell.Empty
+                min_eval = min(min_eval, eval)
+                beta = min(beta, eval)
+                if beta <= alpha:
+                    break
+            return min_eval
 
     def evaluate_window(self, window):
         score = 0

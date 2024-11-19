@@ -19,7 +19,8 @@ class Bot:
 
     def check_line(self, y, x, direction):
         dy, dx = direction
-        weight = 0
+        mine = 0
+        enemy = 0
         for i in range(1, 6):
             tmp_y = y + dy * i
             tmp_x = x + dx * i
@@ -27,12 +28,12 @@ class Bot:
                 continue
             cell = self.map[tmp_y][tmp_x]
             if cell == self.player:
-                weight += 5
+                mine += 1
             elif cell == Cell.Empty:
-                weight += 0
+                continue
             else:
-                weight += -2
-        return weight
+                enemy += 1
+        return mine * 5 + enemy * 10
 
     def check_case(self, y, x, player):
         up_left_line = self.check_line(y, x, Direction.UL.value)
@@ -53,16 +54,22 @@ class Bot:
                 cell = self.map[cell_y][cell_x]
                 if cell is Cell.Empty:
                     weight_map[cell_y][cell_x] = self.check_case(cell_y, cell_x, 1)
-                cell = -1
+                else:
+                    weight_map[cell_y][cell_x] = 0
         best_y = 0
         best_x = 0
         best_weight = 0
+        total_weight = 0
         for cy in range(self.size):
+            line = ''
             for cx in range(self.size):
-                if weight_map[cy][cy] > best_weight:
+                line += str(weight_map[cy][cx]) + '  '
+                total_weight += weight_map[cy][cx]
+                if weight_map[cy][cx] > best_weight:
                     best_y = cy
                     best_x = cx
-        return best_y, best_x
+            self.logger.warn(line)
+        return best_y, best_x, total_weight
 
     def minimax(self, depth, alpha, beta, maximizing_player):
         return self.calc_weight()
@@ -158,16 +165,22 @@ class Bot:
                 height = width
         self.map = [[Cell.Empty for _ in range(width)] for _ in range(height)]
 
-    def play(self):
-        play_y, play_x = self.minimax(1, 0, 0, 2)
-        self.logger.debug(f"{self.information.name} is playing")
+    def randomize_play(self):
         x = randrange(len(self.map[0]))
         y = randrange(len(self.map))
         while self.map[y][x] != Cell.Empty:
             x = randrange(len(self.map[0]))
             y = randrange(len(self.map))
+        return y, x
+
+    def play(self):
+        play_y, play_x, weight = self.minimax(1, 0, 0, 2)
+        if weight == 0:
+            play_y, play_x = self.randomize_play()
+        self.logger.info(str(self.player) + ' I will play: ' + str(play_y) + ' ' + str(play_x) + ' with weight: ' + str(weight))
+        self.logger.debug(f"{self.information.name} is playing")
         self.map[play_y][play_x] = self.player
-        print(f"{x},{y}\r")
+        print(f"{play_x},{play_y}\r")
 
     def run(self):
         self.logger.info(f"{self.information.name} is running")

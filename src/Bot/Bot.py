@@ -21,7 +21,7 @@ class Bot:
         dy, dx = direction
         mine = 0
         enemy = 0
-        for i in range(1, 6):
+        for i in range(1, 5):
             tmp_y = y + dy * i
             tmp_x = x + dx * i
             if tmp_y < 0 or tmp_x < 0 or tmp_y >= 20 or tmp_x >= 20 or (tmp_y == y and tmp_x == x):
@@ -30,12 +30,17 @@ class Bot:
             if cell == self.player:
                 mine += 1
             elif cell == Cell.Empty:
-                continue
+                continue # Maybe break here to check only aligned pawn
             else:
                 enemy += 1
-        return mine * 5 + enemy * 10
+        return [mine, enemy]
 
     def check_case(self, y, x, player):
+        ul_to_dr_m, ul_to_dr_e = 0, 0
+        ur_to_dl_m, ur_to_dl_e = 0, 0
+        up_to_down_m, up_to_down_e = 0, 0
+        left_to_right_m, left_to_right_e = 0, 0
+
         up_left_line = self.check_line(y, x, Direction.UL.value)
         up_right_line = self.check_line(y, x, Direction.UR.value)
         up_line = self.check_line(y, x, Direction.UP.value)
@@ -44,7 +49,22 @@ class Bot:
         down_left_line = self.check_line(y, x, Direction.DL.value)
         down_right_line = self.check_line(y, x, Direction.DR.value)
         down_line = self.check_line(y, x, Direction.DOWN.value)
-        weight = up_left_line + up_right_line + up_line + left_line + right_line + down_left_line + down_right_line + down_line
+
+        ul_to_dr_m += up_left_line[0] + down_right_line[0]
+        ul_to_dr_e += up_left_line[1] + down_right_line[1]
+        ur_to_dl_m += up_right_line[0] + down_left_line[0]
+        ur_to_dl_e += up_right_line[1] + down_left_line[1]
+        up_to_down_m += up_line[0] + down_line[0]
+        up_to_down_e += up_line[1] + down_line[1]
+        left_to_right_m += left_line[0] + right_line[0]
+        left_to_right_e += left_line[1] + right_line[1]
+
+        weight = 0
+        if ul_to_dr_m == 4 or ur_to_dl_m == 4 or up_to_down_m == 4 or left_to_right_m == 4:
+            weight += 100
+        if ul_to_dr_e == 4 or ur_to_dl_e == 4 or up_to_down_e == 4 or left_to_right_e ==4:
+            weight += 100
+        weight += ul_to_dr_m + ul_to_dr_e + ur_to_dl_m + ur_to_dl_e + up_to_down_m + up_to_down_e + left_to_right_m + left_to_right_e
         return weight
 
     def calc_weight(self):
@@ -55,7 +75,7 @@ class Bot:
                 if cell is Cell.Empty:
                     weight_map[cell_y][cell_x] = self.check_case(cell_y, cell_x, 1)
                 else:
-                    weight_map[cell_y][cell_x] = 0
+                    weight_map[cell_y][cell_x] = -1
         best_y = 0
         best_x = 0
         best_weight = 0
@@ -177,7 +197,7 @@ class Bot:
         play_y, play_x, weight = self.minimax(1, 0, 0, 2)
         if weight == 0:
             play_y, play_x = self.randomize_play()
-        self.logger.info(str(self.player) + ' I will play: ' + str(play_y) + ' ' + str(play_x) + ' with weight: ' + str(weight))
+        self.logger.info(str(self.player) + ' I will play: ' + str(play_x) + ' ' + str(play_y) + ' with weight: ' + str(weight))
         self.logger.debug(f"{self.information.name} is playing")
         self.map[play_y][play_x] = self.player
         print(f"{play_x},{play_y}\r")

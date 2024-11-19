@@ -75,23 +75,33 @@ class Commands:
         size = int(command[1])
         if size < 5:
             return self.error(f"Invalid size in START command: {size} (too small)")
-        self.bot.reset_map(size)
+        self.bot.reset(size)
         self.bot.size = size
         print("OK\r")
 
-    def rectstart(self, _):
-        return self.unknown("RECTSTART command isn't yet implemented")
+    def rectstart(self, command):
+        if len(command) <= 1:
+            return self.error("Missing size in RECTSTART command")
+        coordinate = command[1].split(",")
+        if len(coordinate) != 2:
+            return self.error(f"Invalid size in RECTSTART command: {command[1]}")
+        x = int(coordinate[0])
+        y = int(coordinate[1])
+        if x < 5:
+            return self.error(f"Invalid width in RECTSTART command: {x} (too small)")
+        if y < 5:
+            return self.error(f"Invalid width in RECTSTART command: {y} (too small)")
+        self.bot.reset(x, y)
+        print("OK\r")
 
     def restart(self, _):
-        return self.unknown("RESTART command isn't yet implemented")
+        self.bot.reset()
+        print("OK\r")
 
     def swap2board(self, _):
         return self.unknown("SWAP2BOARD command isn't yet implemented")
 
     # region BOARD
-    def board_suite_init(self, command):
-        self.bot.reset_map()
-
     def board_suite_iteration(self, command):
         data = command[0].split(",")
         if len(data) != 3:
@@ -132,8 +142,16 @@ class Commands:
     def play(self, _):
         return self.unknown("PLAY command isn't yet implemented")
 
-    def takeback(self, _):
-        return self.unknown("TAKEBACK command isn't yet implemented")
+    def takeback(self, command):
+        if len(command) <= 1:
+            return self.error("Missing coordinates in TAKEBACK command")
+        coordinate = command[1].split(",")
+        if len(coordinate) != 2:
+            return self.error(f"Invalid coordinates in TAKEBACK command: {command[1]}")
+        x = int(coordinate[0])
+        y = int(coordinate[1])
+        self.bot.map[y][x] = Cell.Empty
+        print("OK\r")
 
     @staticmethod
     def end(_):

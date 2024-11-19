@@ -145,7 +145,7 @@ class Bot:
 
         return None
 
-    def reset_map(self, width=None, height=None):
+    def reset(self, width=None, height=None):
         if width is None:
             if self.map is not None:
                 width = len(self.map[0])

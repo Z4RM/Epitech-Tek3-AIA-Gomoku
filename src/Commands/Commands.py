@@ -80,13 +80,7 @@ class Commands:
         print("OK\r")
 
     def rectstart(self, command):
-        if len(command) <= 1:
-            return self.error("Missing size in RECTSTART command")
-        coordinate = command[1].split(",")
-        if len(coordinate) != 2:
-            return self.error(f"Invalid size in RECTSTART command: {command[1]}")
-        x = int(coordinate[0])
-        y = int(coordinate[1])
+        x, y = self.__get_coordinates_from_command(command, "RECTSTART")
         if x < 5:
             return self.error(f"Invalid width in RECTSTART command: {x} (too small)")
         if y < 5:
@@ -127,29 +121,19 @@ class Commands:
         pass
 
     def turn(self, command):
-        if len(command) <= 1:
-            return self.error("Missing coordinates in TURN command")
+        x, y = self.__get_coordinates_from_command(command, "TURN")
         if self.bot.player == Player.Undefined:
             self.bot.player = Player.Player2
-        coordinate = command[1].split(",")
-        if len(coordinate) != 2:
-            return self.error(f"Invalid coordinates in TURN command: {command[1]}")
-        x = int(coordinate[0])
-        y = int(coordinate[1])
         self.bot.map[y][x] = self.bot.player.opponent()
         self.bot.play()
 
-    def play(self, _):
-        return self.unknown("PLAY command isn't yet implemented")
+    def play(self, command):
+        x, y = self.__get_coordinates_from_command(command, "PLAY")
+        self.bot.map[y][x] = self.bot.player
+        print(f"{x},{y}\r")
 
     def takeback(self, command):
-        if len(command) <= 1:
-            return self.error("Missing coordinates in TAKEBACK command")
-        coordinate = command[1].split(",")
-        if len(coordinate) != 2:
-            return self.error(f"Invalid coordinates in TAKEBACK command: {command[1]}")
-        x = int(coordinate[0])
-        y = int(coordinate[1])
+        x, y = self.__get_coordinates_from_command(command, "TAKEBACK")
         self.bot.map[y][x] = Cell.Empty
         print("OK\r")
 
@@ -168,3 +152,11 @@ class Commands:
         print(f"ERROR {message}\r")
         return False
     # endregion
+
+    def __get_coordinates_from_command(self, command, command_name):
+        if len(command) <= 1:
+            return self.error(f"Missing coordinates in {command_name} command")
+        coordinate = command[1].split(",")
+        if len(coordinate) != 2:
+            return self.error(f"Invalid coordinates in {command_name} command: {command[1]}")
+        return int(coordinate[0]), int(coordinate[1])

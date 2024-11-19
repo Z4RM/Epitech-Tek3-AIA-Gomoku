@@ -75,23 +75,27 @@ class Commands:
         size = int(command[1])
         if size < 5:
             return self.error(f"Invalid size in START command: {size} (too small)")
-        self.bot.reset_map(size)
+        self.bot.reset(size)
         self.bot.size = size
         print("OK\r")
 
-    def rectstart(self, _):
-        return self.unknown("RECTSTART command isn't yet implemented")
+    def rectstart(self, command):
+        x, y = self.__get_coordinates_from_command(command, "RECTSTART")
+        if x < 5:
+            return self.error(f"Invalid width in RECTSTART command: {x} (too small)")
+        if y < 5:
+            return self.error(f"Invalid width in RECTSTART command: {y} (too small)")
+        self.bot.reset(x, y)
+        print("OK\r")
 
     def restart(self, _):
-        return self.unknown("RESTART command isn't yet implemented")
+        self.bot.reset()
+        print("OK\r")
 
     def swap2board(self, _):
         return self.unknown("SWAP2BOARD command isn't yet implemented")
 
     # region BOARD
-    def board_suite_init(self, command):
-        self.bot.reset_map()
-
     def board_suite_iteration(self, command):
         data = command[0].split(",")
         if len(data) != 3:
@@ -117,23 +121,21 @@ class Commands:
         pass
 
     def turn(self, command):
-        if len(command) <= 1:
-            return self.error("Missing coordinates in TURN command")
+        x, y = self.__get_coordinates_from_command(command, "TURN")
         if self.bot.player == Player.Undefined:
             self.bot.player = Player.Player2
-        coordinate = command[1].split(",")
-        if len(coordinate) != 2:
-            return self.error(f"Invalid coordinates in TURN command: {command[1]}")
-        x = int(coordinate[0])
-        y = int(coordinate[1])
         self.bot.map[y][x] = self.bot.player.opponent()
         self.bot.play()
 
-    def play(self, _):
-        return self.unknown("PLAY command isn't yet implemented")
+    def play(self, command):
+        x, y = self.__get_coordinates_from_command(command, "PLAY")
+        self.bot.map[y][x] = self.bot.player
+        print(f"{x},{y}\r")
 
-    def takeback(self, _):
-        return self.unknown("TAKEBACK command isn't yet implemented")
+    def takeback(self, command):
+        x, y = self.__get_coordinates_from_command(command, "TAKEBACK")
+        self.bot.map[y][x] = Cell.Empty
+        print("OK\r")
 
     @staticmethod
     def end(_):
@@ -150,3 +152,11 @@ class Commands:
         print(f"ERROR {message}\r")
         return False
     # endregion
+
+    def __get_coordinates_from_command(self, command, command_name):
+        if len(command) <= 1:
+            return self.error(f"Missing coordinates in {command_name} command")
+        coordinate = command[1].split(",")
+        if len(coordinate) != 2:
+            return self.error(f"Invalid coordinates in {command_name} command: {command[1]}")
+        return int(coordinate[0]), int(coordinate[1])

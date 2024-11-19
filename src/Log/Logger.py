@@ -1,3 +1,4 @@
+from os import getpid
 from datetime import datetime
 from src.Config.Config import Config
 
@@ -28,6 +29,7 @@ class Logger:
             log_file = "log.txt"
         self.log_file = open(log_file, "a")
         self.log_file.write("====================\n")
+        self.pid = getpid()
 
     def __del__(self):
         if self.log_level != "None":
@@ -35,7 +37,7 @@ class Logger:
 
     def log(self, log_level, message):
         if LOG_LEVEL[self.log_level] <= LOG_LEVEL[log_level]:
-            self.log_file.write(f"[{datetime.now().strftime('%d/%m/%Y %H:%M:%S')}] {log_level}: {message}\n")
+            self.log_file.write(f"[{datetime.now().strftime('%d/%m/%Y %H:%M:%S')}] [{self.pid}] {log_level}: {message}\n")
             self.log_file.flush()
 
     def debug(self, message):

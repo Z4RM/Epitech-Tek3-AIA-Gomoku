@@ -28,7 +28,6 @@ class Logger:
         except KeyError:
             log_file = "log.txt"
         self.log_file = open(log_file, "a")
-        self.log_file.write("====================\n")
         self.pid = getpid()
 
     def __del__(self):

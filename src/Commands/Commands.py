@@ -57,16 +57,16 @@ class Commands:
                     if self.commands[r].executions:
                         executed += 1
                 if executed == 0:
-                    print(f"One of these commands must be executed before {command}: {', '.join(requirement)}\r")
+                    self.error(f"One of these commands must be executed before {command}: {', '.join(requirement)}\r")
                     return False
             elif not self.commands[requirement].executions:
-                print(f"{requirement} command must be executed before {command}\r")
+                self.error(f"{requirement} command must be executed before {command}\r")
                 return False
         return True
     # endregion
 
     def about(self, _):
-        print(self.bot.information())
+        print(self.bot.information(), flush=True)
 
     def start(self, command):
         if len(command) <= 1:
@@ -76,7 +76,7 @@ class Commands:
             return self.error(f"Invalid size in START command: {size} (too small)")
         self.bot.reset(size)
         self.bot.size = size
-        print("OK\r")
+        print("OK\r", flush=True)
 
     def rectstart(self, command):
         x, y = self.__get_coordinates_from_command(command, "RECTSTART")
@@ -85,11 +85,11 @@ class Commands:
         if y < 5:
             return self.error(f"Invalid width in RECTSTART command: {y} (too small)")
         self.bot.reset(x, y)
-        print("OK\r")
+        print("OK\r", flush=True)
 
     def restart(self, _):
         self.bot.reset()
-        print("OK\r")
+        print("OK\r", flush=True)
 
     def swap2board(self, _):
         return self.unknown("SWAP2BOARD command isn't yet implemented")
@@ -134,14 +134,14 @@ class Commands:
         if x >= len(self.bot.map[0]) or y >= len(self.bot.map):
             return self.error(f"Invalid coordinates: {x}, {y}")
         self.bot.map[y][x] = Cell.Me
-        print(f"{x},{y}\r")
+        print(f"{x},{y}\r", flush=True)
 
     def takeback(self, command):
         x, y = self.__get_coordinates_from_command(command, "TAKEBACK")
         if x >= len(self.bot.map[0]) or y >= len(self.bot.map):
             return self.error(f"Invalid coordinates: {x}, {y}")
         self.bot.map[y][x] = Cell.Empty
-        print("OK\r")
+        print("OK\r", flush=True)
 
     @staticmethod
     def end(_):
@@ -150,12 +150,12 @@ class Commands:
     # region Errors
     def unknown(self, message):
         self.logger.error(message)
-        print(f"UNKNOWN {message}\r")
+        print(f"UNKNOWN {message}\r", flush=True)
         return False
 
     def error(self, message):
         self.logger.error(message)
-        print(f"ERROR {message}\r")
+        print(f"ERROR {message}\r", flush=True)
         return False
     # endregion
 

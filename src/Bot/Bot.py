@@ -4,10 +4,10 @@ from sympy.strategies.core import switch
 
 from src.Config.Config import Config
 from src.Log.Logger import Logger
-from src.Enums.Player import Player
 from src.Enums.Cell import Cell
 from src.Enums.Direction import Direction
 from src.Bot.Information import Information
+
 
 class Bot:
     def __init__(self, config: Config, logger: Logger):
@@ -15,7 +15,6 @@ class Bot:
         self.logger = logger
         self.map = None
         self.size = 0
-        self.player = Player.Player1
         from src.Commands.Commands import Commands  # Deferred import to avoid circular dependencies issues between Bot and Commands
         self.commands = Commands(self, logger)
         self.logger.info(self.information())
@@ -46,7 +45,6 @@ class Bot:
                 return_value += 2000
         return return_value
 
-
     def get_best_move(self, weights_map):
         best_x = -1
         best_y = -1
@@ -69,15 +67,13 @@ class Bot:
         weights_map = [[Cell.Empty.value for _ in range(len(self.map[y]))] for y in range(len(self.map))]
         enemy_alignment = 0
         personal_alignment = 0
-        mine = Cell.Player1.value if self.player == Player.Player1 else Cell.Player2.value
-        enemy = Cell.Player2.value if self.player == Player.Player1 else Cell.Player1.value
         for y in range(len(self.map)):
             for x in range(len(self.map[y])):
                 weight = 0
-                if self.map[y][x] == mine:
+                if self.map[y][x] == Cell.Me:
                     enemy_alignment = 0
                     personal_alignment += 1
-                elif self.map[y][x] == enemy:
+                elif self.map[y][x] == Cell.Opponent:
                     enemy_alignment += 1
                     personal_alignment = 0
                 else:
@@ -110,9 +106,9 @@ class Bot:
 
     def play(self):
         play_y, play_x = self.calc_weight()
-        self.logger.debug(f"{self.player} is playing at {play_x}, {play_y}")
+        self.logger.debug(f"Playing at {play_x}, {play_y}")
         self.logger.debug(f"{self.information.name} is playing")
-        self.map[play_y][play_x] = self.player
+        self.map[play_y][play_x] = Cell.Me
         print(f"{play_x},{play_y}\r")
 
     def run(self):

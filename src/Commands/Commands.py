@@ -1,6 +1,5 @@
 from src.Bot.Bot import Bot
 from src.Log.Logger import Logger
-from src.Enums.Player import Player
 from src.Enums.Cell import Cell
 from src.Commands.Command import Command
 from src.Commands.CommandSuite import CommandSuite
@@ -106,9 +105,9 @@ class Commands:
             return self.error(f"Invalid coordinates: {x}, {y}")
         match data[2]:
             case "1":
-                self.bot.map[y][x] = Player.Player1
+                self.bot.map[y][x] = Cell.Me
             case "2":
-                self.bot.map[y][x] = Player.Player2
+                self.bot.map[y][x] = Cell.Opponent
             case _:
                 return self.error(f"Invalid field: {data[2]}")
 
@@ -127,14 +126,14 @@ class Commands:
         x, y = self.__get_coordinates_from_command(command, "TURN")
         if x >= len(self.bot.map[0]) or y >= len(self.bot.map):
             return self.error(f"Invalid coordinates: {x}, {y}")
-        self.bot.map[y][x] = Player.Player2
+        self.bot.map[y][x] = Cell.Opponent
         self.bot.play()
 
     def play(self, command):
         x, y = self.__get_coordinates_from_command(command, "PLAY")
         if x >= len(self.bot.map[0]) or y >= len(self.bot.map):
             return self.error(f"Invalid coordinates: {x}, {y}")
-        self.bot.map[y][x] = Player.Player1
+        self.bot.map[y][x] = Cell.Me
         print(f"{x},{y}\r")
 
     def takeback(self, command):

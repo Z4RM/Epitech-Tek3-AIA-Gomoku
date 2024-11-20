@@ -100,13 +100,17 @@ class Commands:
         data = command[0].split(",")
         if len(data) != 3:
             return self.error(f"Invalid data: {command[0]}")
-        if data[2] != "1" and data[2] != "2":
-            return self.error(f"Invalid field: {data[2]}")
         x = int(data[0])
         y = int(data[1])
         if x >= len(self.bot.map[0]) or y >= len(self.bot.map):
             return self.error(f"Invalid coordinates: {x}, {y}")
-        self.bot.map[y][x] = Cell.from_int(int(data[2]))
+        match data[2]:
+            case "1":
+                self.bot.map[y][x] = self.bot.player
+            case "2":
+                self.bot.map[y][x] = self.bot.player.opponent()
+            case _:
+                return self.error(f"Invalid field: {data[2]}")
 
     def board_suite_end(self, _):
         self.suite = None

@@ -126,6 +126,8 @@ class Commands:
 
     def turn(self, command):
         x, y = self.__get_coordinates_from_command(command, "TURN")
+        if x >= len(self.bot.map[0]) or y >= len(self.bot.map):
+            return self.error(f"Invalid coordinates: {x}, {y}")
         if self.bot.player == Player.Undefined:
             self.bot.player = Player.Player2
         self.bot.map[y][x] = self.bot.player.opponent()
@@ -133,11 +135,15 @@ class Commands:
 
     def play(self, command):
         x, y = self.__get_coordinates_from_command(command, "PLAY")
+        if x >= len(self.bot.map[0]) or y >= len(self.bot.map):
+            return self.error(f"Invalid coordinates: {x}, {y}")
         self.bot.map[y][x] = self.bot.player
         print(f"{x},{y}\r")
 
     def takeback(self, command):
         x, y = self.__get_coordinates_from_command(command, "TAKEBACK")
+        if x >= len(self.bot.map[0]) or y >= len(self.bot.map):
+            return self.error(f"Invalid coordinates: {x}, {y}")
         self.bot.map[y][x] = Cell.Empty
         print("OK\r")
 

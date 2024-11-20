@@ -106,9 +106,9 @@ class Commands:
             return self.error(f"Invalid coordinates: {x}, {y}")
         match data[2]:
             case "1":
-                self.bot.map[y][x] = self.bot.player
+                self.bot.map[y][x] = Player.Player1
             case "2":
-                self.bot.map[y][x] = self.bot.player.opponent()
+                self.bot.map[y][x] = Player.Player2
             case _:
                 return self.error(f"Invalid field: {data[2]}")
 
@@ -118,7 +118,6 @@ class Commands:
     # endregion
 
     def begin(self, _):
-        self.bot.player = Player.Player1
         self.bot.play()
 
     def info(self, _):
@@ -128,16 +127,14 @@ class Commands:
         x, y = self.__get_coordinates_from_command(command, "TURN")
         if x >= len(self.bot.map[0]) or y >= len(self.bot.map):
             return self.error(f"Invalid coordinates: {x}, {y}")
-        if self.bot.player == Player.Undefined:
-            self.bot.player = Player.Player2
-        self.bot.map[y][x] = self.bot.player.opponent()
+        self.bot.map[y][x] = Player.Player2
         self.bot.play()
 
     def play(self, command):
         x, y = self.__get_coordinates_from_command(command, "PLAY")
         if x >= len(self.bot.map[0]) or y >= len(self.bot.map):
             return self.error(f"Invalid coordinates: {x}, {y}")
-        self.bot.map[y][x] = self.bot.player
+        self.bot.map[y][x] = Player.Player1
         print(f"{x},{y}\r")
 
     def takeback(self, command):

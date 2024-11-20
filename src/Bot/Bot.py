@@ -14,7 +14,6 @@ class Bot:
         self.information = Information(config)
         self.logger = logger
         self.map = None
-        self.size = 0
         from src.Commands.Commands import Commands  # Deferred import to avoid circular dependencies issues between Bot and Commands
         self.commands = Commands(self, logger)
         self.logger.info(self.information())

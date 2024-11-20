@@ -100,13 +100,17 @@ class Commands:
         data = command[0].split(",")
         if len(data) != 3:
             return self.error(f"Invalid data: {command[0]}")
-        if data[2] != "1" and data[2] != "2":
-            return self.error(f"Invalid field: {data[2]}")
         x = int(data[0])
         y = int(data[1])
         if x >= len(self.bot.map[0]) or y >= len(self.bot.map):
             return self.error(f"Invalid coordinates: {x}, {y}")
-        self.bot.map[y][x] = Cell.from_int(int(data[2]))
+        match data[2]:
+            case "1":
+                self.bot.map[y][x] = Player.Player1
+            case "2":
+                self.bot.map[y][x] = Player.Player2
+            case _:
+                return self.error(f"Invalid field: {data[2]}")
 
     def board_suite_end(self, _):
         self.suite = None
@@ -114,7 +118,6 @@ class Commands:
     # endregion
 
     def begin(self, _):
-        self.bot.player = Player.Player1
         self.bot.play()
 
     def info(self, _):
@@ -122,18 +125,22 @@ class Commands:
 
     def turn(self, command):
         x, y = self.__get_coordinates_from_command(command, "TURN")
-        if self.bot.player == Player.Undefined:
-            self.bot.player = Player.Player2
-        self.bot.map[y][x] = self.bot.player.opponent()
+        if x >= len(self.bot.map[0]) or y >= len(self.bot.map):
+            return self.error(f"Invalid coordinates: {x}, {y}")
+        self.bot.map[y][x] = Player.Player2
         self.bot.play()
 
     def play(self, command):
         x, y = self.__get_coordinates_from_command(command, "PLAY")
-        self.bot.map[y][x] = self.bot.player
+        if x >= len(self.bot.map[0]) or y >= len(self.bot.map):
+            return self.error(f"Invalid coordinates: {x}, {y}")
+        self.bot.map[y][x] = Player.Player1
         print(f"{x},{y}\r")
 
     def takeback(self, command):
         x, y = self.__get_coordinates_from_command(command, "TAKEBACK")
+        if x >= len(self.bot.map[0]) or y >= len(self.bot.map):
+            return self.error(f"Invalid coordinates: {x}, {y}")
         self.bot.map[y][x] = Cell.Empty
         print("OK\r")
 

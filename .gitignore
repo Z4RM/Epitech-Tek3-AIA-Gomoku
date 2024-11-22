@@ -173,3 +173,8 @@ cython_debug/
 
 # Log files
 log.*
+
+# Test servers (liskvork, qpiskvork...)
+liskvork
+qpiskvork
+liblibsgfcplusplus.so*

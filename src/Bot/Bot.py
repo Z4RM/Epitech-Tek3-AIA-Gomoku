@@ -121,7 +121,7 @@ class Bot:
         self.logger.debug(f"Playing at {play_x}, {play_y}")
         self.logger.debug(f"{self.information.name} is playing")
         self.map[play_y][play_x] = Cell.Me
-        print(f"{play_x},{play_y}\r")
+        print(f"{play_x},{play_y}\r", flush=True)
 
     def run(self):
         self.logger.info(f"{self.information.name} is running")

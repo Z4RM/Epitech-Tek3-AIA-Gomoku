@@ -64,7 +64,6 @@ class Bot:
                 best_x = len(self.map[0]) // 2
             else:
                 best_y, best_x = self.randomize_play()
-        self.logger.warn(f'Best move is at {best_x}, {best_y} with weight {best_weight}')
         return best_y, best_x
 
     def check_direction(self, x, y, direction, is_personal):
@@ -88,7 +87,6 @@ class Bot:
         alignment = 0
         for direction in Direction:
             alignment += self.check_direction(x, y, direction, is_personal)
-            self.logger.debug(f"Alignment: {alignment} for direction {direction.value[2]} from {x}, {y}")
         return alignment
 
     def calc_weight(self):

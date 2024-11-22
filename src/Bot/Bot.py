@@ -48,18 +48,31 @@ class Bot:
         best_x = -1
         best_y = -1
         best_weight = 0
-        for y in range(len(weights_map)):
-            for x in range(len(weights_map[y])):
-                if weights_map[y][x] > best_weight:
-                    best_weight = weights_map[y][x]
-                    best_y = y
-                    best_x = x
+
+        for y in range(len(self.map)):
+            for x in range(len(self.map[0])):
+                if self.map[y][x] == Cell.Empty:
+                    current_weight = weights_map[y][x]
+
+                    if 0 < x < len(self.map[0]) - 1:
+                        current_weight += weights_map[y][x - 1] + weights_map[y][x + 1]
+                    if 0 < y < len(self.map) - 1:
+                        current_weight += weights_map[y - 1][x] + weights_map[y + 1][x]
+                    if 0 < x < len(self.map[0]) - 1 and 0 < y < len(self.map) - 1:
+                        current_weight += weights_map[y - 1][x - 1] + weights_map[y + 1][x + 1]
+                    if 0 < x < len(self.map[0]) - 1 and len(self.map) - 1 > y > 0:
+                        current_weight += weights_map[y + 1][x - 1] + weights_map[y - 1][x + 1]
+                    if current_weight > best_weight:
+                        best_weight = current_weight
+                        best_x = x
+                        best_y = y
         if best_x == -1 and best_y == -1:
             if self.map[len(self.map) // 2][len(self.map[0]) // 2] == Cell.Empty:
                 best_y = len(self.map) // 2
                 best_x = len(self.map[0]) // 2
             else:
                 best_y, best_x = self.randomize_play()
+
         return best_y, best_x
 
     def calc_weight(self):

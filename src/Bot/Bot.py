@@ -53,15 +53,6 @@ class Bot:
             for x in range(len(self.map[0])):
                 if self.map[y][x] == Cell.Empty:
                     current_weight = weights_map[y][x]
-
-                    if 0 < x < len(self.map[0]) - 1:
-                        current_weight += weights_map[y][x - 1] + weights_map[y][x + 1]
-                    if 0 < y < len(self.map) - 1:
-                        current_weight += weights_map[y - 1][x] + weights_map[y + 1][x]
-                    if 0 < x < len(self.map[0]) - 1 and 0 < y < len(self.map) - 1:
-                        current_weight += weights_map[y - 1][x - 1] + weights_map[y + 1][x + 1]
-                    if 0 < x < len(self.map[0]) - 1 and len(self.map) - 1 > y > 0:
-                        current_weight += weights_map[y + 1][x - 1] + weights_map[y - 1][x + 1]
                     if current_weight > best_weight:
                         best_weight = current_weight
                         best_x = x
@@ -75,6 +66,30 @@ class Bot:
 
         return best_y, best_x
 
+    def check_direction(self, x, y, direction, is_personal):
+        alignment = 0
+        x_direction = direction.value[0]
+        y_direction = direction.value[1]
+        x_position = x + x_direction
+        y_position = y + y_direction
+        while 0 <= x_position < len(self.map[0]) and 0 <= y_position < len(self.map):
+            if self.map[y_position][x_position] == Cell.Empty:
+                break
+            elif self.map[y_position][x_position] == Cell.Me and is_personal:
+                alignment += 1
+                break
+            elif self.map[y_position][x_position] == Cell.Opponent and not is_personal:
+                alignment += 1
+            x_position += x_direction
+            y_position += y_direction
+        return alignment
+
+    def check_all_direction(self, x, y, is_personal):
+        alignment = 0
+        for direction in Direction:
+            alignment += self.check_direction(x, y, direction, is_personal)
+        return alignment
+
     def calc_weight(self):
         weights_map = [[Cell.Empty.value for _ in range(len(self.map[y]))] for y in range(len(self.map))]
         enemy_alignment = 0
@@ -84,9 +99,9 @@ class Bot:
                 weight = 0
                 if self.map[y][x] == Cell.Me:
                     enemy_alignment = 0
-                    personal_alignment += 1
+                    personal_alignment += self.check_all_direction(x, y, True)
                 elif self.map[y][x] == Cell.Opponent:
-                    enemy_alignment += 1
+                    enemy_alignment += self.check_all_direction(x, y, False)
                     personal_alignment = 0
                 else:
                     weight = self.get_weight(enemy_alignment, personal_alignment)

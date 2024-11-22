@@ -1,5 +1,6 @@
 from random import randrange
 
+from nltk import align
 from sympy.strategies.core import switch
 
 from src.Config.Config import Config
@@ -63,31 +64,31 @@ class Bot:
                 best_x = len(self.map[0]) // 2
             else:
                 best_y, best_x = self.randomize_play()
-
+        self.logger.warn(f'Best move is at {best_x}, {best_y} with weight {best_weight}')
         return best_y, best_x
 
     def check_direction(self, x, y, direction, is_personal):
         alignment = 0
-        x_direction = direction.value[0]
-        y_direction = direction.value[1]
+        x_direction = direction.value[1]
+        y_direction = direction.value[0]
         x_position = x + x_direction
         y_position = y + y_direction
-        while 0 <= x_position < len(self.map[0]) and 0 <= y_position < len(self.map):
-            if self.map[y_position][x_position] == Cell.Empty:
-                break
-            elif self.map[y_position][x_position] == Cell.Me and is_personal:
-                alignment += 1
-                break
+        looped = 1
+        while 0 <= y_position < len(self.map) < y + 5 and 0 <= x_position < x + 5 < len(self.map[y_position]):
+            if self.map[y_position][x_position] == Cell.Me and is_personal:
+                alignment += 1 * looped
             elif self.map[y_position][x_position] == Cell.Opponent and not is_personal:
-                alignment += 1
+                alignment += 1 * looped
             x_position += x_direction
             y_position += y_direction
+            looped += 1
         return alignment
 
     def check_all_direction(self, x, y, is_personal):
         alignment = 0
         for direction in Direction:
             alignment += self.check_direction(x, y, direction, is_personal)
+            self.logger.debug(f"Alignment: {alignment} for direction {direction.value[2]} from {x}, {y}")
         return alignment
 
     def calc_weight(self):
@@ -99,12 +100,12 @@ class Bot:
                 weight = 0
                 if self.map[y][x] == Cell.Me:
                     enemy_alignment = 0
-                    personal_alignment += self.check_all_direction(x, y, True)
+                    personal_alignment += 1
                 elif self.map[y][x] == Cell.Opponent:
-                    enemy_alignment += self.check_all_direction(x, y, False)
+                    enemy_alignment += 1
                     personal_alignment = 0
                 else:
-                    weight = self.get_weight(enemy_alignment, personal_alignment)
+                    weight = self.get_weight(enemy_alignment, personal_alignment) + self.check_all_direction(x, y, True)
                     enemy_alignment = 0
                     personal_alignment = 0
                 weights_map[y][x] = weight

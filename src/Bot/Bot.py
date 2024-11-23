@@ -142,6 +142,10 @@ class Bot:
             except EOFError:
                 self.logger.debug("Received EOF (Ctrl + D), exiting")
                 break
+            except UnicodeDecodeError as error:
+                # `input()` may raise an `UnicodeDecodeError` exception if (for example) "à⌫" ("⌫" = backspace) is entered
+                self.commands.error(error)
+                continue
             self.logger.debug(f"Received command: {command}")
             if self.commands.execute(command):
                 break

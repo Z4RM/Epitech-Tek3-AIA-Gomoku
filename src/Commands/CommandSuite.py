@@ -6,12 +6,13 @@ class CommandSuite:
         self.suite_iteration = suite_iteration
         self.ender = ender
         self.suite_end = suite_end
-        self.executed = False
+        self.initialized = False
 
     def __call__(self, *args, **kwargs):
-        if not self.executed:
-            self.executed = True
+        if not self.initialized:
+            self.initialized = True
             return
         if args[0][0] == self.ender:
+            self.initialized = False
             return self.suite_end(*args, **kwargs)
         return self.suite_iteration(*args, **kwargs)

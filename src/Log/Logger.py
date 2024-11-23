@@ -27,8 +27,11 @@ class Logger:
             log_file = config.get("log", "file")
         except KeyError:
             log_file = "log.txt"
-        self.log_file = open(log_file, "a")
-        self.pid = getpid()
+        try:
+            self.log_file = open(log_file, "a")
+            self.pid = getpid()
+        except PermissionError:
+            self.log_level = "None"
 
     def __del__(self):
         if self.log_level != "None":

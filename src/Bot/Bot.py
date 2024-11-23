@@ -1,8 +1,4 @@
 from random import randrange
-
-from nltk import align
-from sympy.strategies.core import switch
-
 from src.Config.Config import Config
 from src.Log.Logger import Logger
 from src.Enums.Cell import Cell
@@ -19,7 +15,8 @@ class Bot:
         self.commands = Commands(self, logger)
         self.logger.info(self.information())
 
-    def get_weight(self, enemy_alignment, personal_alignment):
+    @staticmethod
+    def get_weight(enemy_alignment, personal_alignment):
         return_value = 0
         match enemy_alignment:
             case 0:

@@ -1,7 +1,4 @@
 from random import randrange
-
-from sympy.strategies.core import switch
-
 from src.Config.Config import Config
 from src.Log.Logger import Logger
 from src.Enums.Cell import Cell
@@ -18,7 +15,8 @@ class Bot:
         self.commands = Commands(self, logger)
         self.logger.info(self.information())
 
-    def get_weight(self, enemy_alignment, personal_alignment):
+    @staticmethod
+    def get_weight(enemy_alignment, personal_alignment):
         return_value = 0
         match enemy_alignment:
             case 0:
@@ -48,12 +46,15 @@ class Bot:
         best_x = -1
         best_y = -1
         best_weight = 0
-        for y in range(len(weights_map)):
-            for x in range(len(weights_map[y])):
-                if weights_map[y][x] > best_weight:
-                    best_weight = weights_map[y][x]
-                    best_y = y
-                    best_x = x
+
+        for y in range(len(self.map)):
+            for x in range(len(self.map[0])):
+                if self.map[y][x] == Cell.Empty:
+                    current_weight = weights_map[y][x]
+                    if current_weight > best_weight:
+                        best_weight = current_weight
+                        best_x = x
+                        best_y = y
         if best_x == -1 and best_y == -1:
             if self.map[len(self.map) // 2][len(self.map[0]) // 2] == Cell.Empty:
                 best_y = len(self.map) // 2
@@ -61,6 +62,29 @@ class Bot:
             else:
                 best_y, best_x = self.randomize_play()
         return best_y, best_x
+
+    def check_direction(self, x, y, direction, is_personal):
+        alignment = 0
+        x_direction = direction.value[1]
+        y_direction = direction.value[0]
+        x_position = x + x_direction
+        y_position = y + y_direction
+        looped = 1
+        while 0 <= y_position < len(self.map) < y + 5 and 0 <= x_position < x + 5 < len(self.map[y_position]):
+            if self.map[y_position][x_position] == Cell.Me and is_personal:
+                alignment += 1 * looped
+            elif self.map[y_position][x_position] == Cell.Opponent and not is_personal:
+                alignment += 1 * looped
+            x_position += x_direction
+            y_position += y_direction
+            looped += 1
+        return alignment
+
+    def check_all_direction(self, x, y, is_personal):
+        alignment = 0
+        for direction in Direction:
+            alignment += self.check_direction(x, y, direction, is_personal)
+        return alignment
 
     def calc_weight(self):
         weights_map = [[Cell.Empty.value for _ in range(len(self.map[y]))] for y in range(len(self.map))]
@@ -76,7 +100,7 @@ class Bot:
                     enemy_alignment += 1
                     personal_alignment = 0
                 else:
-                    weight = self.get_weight(enemy_alignment, personal_alignment)
+                    weight = self.get_weight(enemy_alignment, personal_alignment) + self.check_all_direction(x, y, True)
                     enemy_alignment = 0
                     personal_alignment = 0
                 weights_map[y][x] = weight
@@ -108,7 +132,7 @@ class Bot:
         self.logger.debug(f"Playing at {play_x}, {play_y}")
         self.logger.debug(f"{self.information.name} is playing")
         self.map[play_y][play_x] = Cell.Me
-        print(f"{play_x},{play_y}\r")
+        print(f"{play_x},{play_y}\r", flush=True)
 
     def run(self):
         self.logger.info(f"{self.information.name} is running")

@@ -30,12 +30,12 @@ class Commands:
     # region Command execution
     def execute(self, command):
         split_command = command.split()
-        command = split_command[0]
         if len(split_command) < 1:
             self.logger.error("Received empty command")
             return
         if self.suite is not None:
             return self.suite(split_command)
+        command = split_command[0]
         if command not in self.commands:
             self.unknown(f"Unknown command: {command}")
             return
